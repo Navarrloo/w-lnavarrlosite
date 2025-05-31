@@ -1,33 +1,815 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unit Manager</title>
+    <title>Grow a Garden</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        .popup {
+        body {
+            background: linear-gradient(rgba(26, 26, 26, 0.9), rgba(26, 26, 26, 0.9)), url('https://avatars.mds.yandex.net/i?id=2a00000196fe105da65cc69d42c03194e344-1594506-fast-images&n=13');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: rgba(51, 51, 51, 0.8);
+            box-shadow: 0 0 0.625rem rgba(255, 255, 255, 0.3);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .trade-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #444;
+            cursor: pointer;
+            color: #ccc;
+            font-weight: bold;
+            background: #1a1a1a;
+            border-radius: 0.3125rem;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .trade-btn:hover {
+            background: #2a2a2a;
+            transform: scale(1.05);
+        }
+
+        main {
+            display: flex;
+            justify-content: space-around;
+            gap: 5rem;
+            padding: 3rem;
+            flex: 1;
+        }
+
+        .value-section {
+            text-align: center;
+            width: 40%;
+        }
+
+        .your-value {
+            color: #ff5555;
+            font-size: 1.5rem;
+        }
+
+        .their-value {
+            color: #55aaff;
+            font-size: 1.5rem;
+        }
+
+        .add-btn {
+            font-size: 3rem;
+            background: linear-gradient(to bottom, #1a1a1a, #2a2a2a);
+            border: 3px solid #444;
+            color: #ccc;
+            width: 4.5rem;
+            height: 4.5rem;
+            cursor: pointer;
+            margin: 1rem 0;
+            border-radius: 0.625rem;
+            box-shadow: 0 0 0.625rem rgba(255, 255, 255, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .add-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 0.625rem rgba(255, 255, 255, 0.4);
+        }
+
+        .selected-units {
+            margin-top: 1rem;
+        }
+
+        .unit-icon {
+            margin: 0.3125rem;
+            display: inline-block;
+            cursor: pointer;
+            width: 5rem;
+            height: 5rem;
+            position: relative;
+            border-radius: 0.625rem;
+            overflow: hidden;
+            border: 2px solid #444;
+        }
+
+        .unit-icon img {
+            width: 100%;
+            height: 100%;
+            border-radius: 0.625rem;
+            object-fit: cover;
+            display: block;
+        }
+
+        .unit-quantity {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.3rem;
+        }
+
+        .modal {
             display: none;
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            padding: 20px;
-            background: white;
-            border: 1px solid black;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #000;
+            padding: 1.25rem;
+            width: 80%;
+            max-width: 30rem;
+            border-radius: 0.3125rem;
+            position: relative;
+            text-align: center;
+        }
+
+        .trade-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .trade-modal .modal-content {
+            width: 90%;
+            max-width: 40rem;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .trade-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .trade-form select, .trade-form input {
+            padding: 0.5rem;
+            background-color: #444;
+            border: none;
+            color: white;
+            border-radius: 0.3125rem;
+        }
+
+        .trade-form button {
+            padding: 0.625rem;
+            cursor: pointer;
+            background: linear-gradient(to bottom, #1a1a1a, #2a2a2a);
+            color: #ccc;
+            border: 3px solid #444;
+            border-radius: 0.3125rem;
+            transition: background 0.2s;
+        }
+
+        .trade-form button:hover {
+            background: linear-gradient(to bottom, #2a2a2a, #3a3a3a);
+        }
+
+        .trade-list {
+            margin-top: 1rem;
+        }
+
+        .trade-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background-color: rgba(51, 51, 51, 0.8);
+            border-radius: 0.625rem;
+            margin-bottom: 1rem;
+        }
+
+        .trade-item .avatar {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background-color: #555;
+            margin-right: 0.5rem;
+        }
+
+        .trade-item .user-info {
+            flex-grow: 1;
+        }
+
+        .trade-item .offer-wants {
+            display: flex;
+            gap: 2rem;
+            flex-grow: 1;
+        }
+
+        .trade-item .offer-wants div {
+            text-align: center;
+        }
+
+        .trade-item .offer-wants img {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 0.3125rem;
+        }
+
+        .trade-item .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .trade-item .actions button {
+            padding: 0.3rem 0.6rem;
+            border: 2px solid #444;
+            cursor: pointer;
+            color: #ccc;
+            background: #1a1a1a;
+            border-radius: 0.3125rem;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .trade-item .actions button:hover {
+            background: #2a2a2a;
+            transform: scale(1.05);
+        }
+
+        .quantity-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .quantity-modal .modal-content {
+            width: 90%;
+            max-width: 20rem;
+            display: block;
+        }
+
+        .quantity-modal h2 {
+            margin: 0 0 0.625rem;
+            font-size: 1.25rem;
+        }
+
+        .quantity-modal input[type="number"] {
+            width: 100%;
+            padding: 0.625rem;
+            margin-bottom: 0.625rem;
+            background-color: #444;
+            border: none;
+            color: white;
+        }
+
+        .quantity-modal button {
+            width: 100%;
+            padding: 0.625rem;
+            cursor: pointer;
+            background: linear-gradient(to bottom, #1a1a1a, #2a2a2a);
+            color: #ccc;
+            border: 3px solid #444;
+            border-radius: 0.3125rem;
+            transition: background 0.2s;
+        }
+
+        .quantity-modal button:hover {
+            background: linear-gradient(to bottom, #2a2a2a, #3a3a3a);
+        }
+
+        .close {
+            position: absolute;
+            top: 0.625rem;
+            right: 0.625rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .unit-categories {
+            display: flex;
+            gap: 0.625rem;
+            justify-content: center;
+        }
+
+        .unit-categories button {
+            padding: 0.625rem;
+            border: 2px solid #444;
+            cursor: pointer;
+            color: #ccc;
+            font-weight: bold;
+            background: #1a1a1a;
+            border-radius: 0.3125rem;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .unit-categories button:hover {
+            background: #2a2a2a;
+            transform: scale(1.05);
+        }
+
+        .unit-grid-container {
+            flex: 1;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .unit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(6.25rem, 1fr));
+            gap: 0.625rem;
+            justify-content: center;
+        }
+
+        .unit {
+            margin: 0.3125rem;
+            cursor: pointer;
+            width: 5rem;
+            height: 5rem;
+            position: relative;
+            border-radius: 0.625rem;
+            overflow: hidden;
+            transition: transform 0.2s;
+            border: 2px solid #444;
+        }
+
+        .unit:hover {
+            transform: scale(1.05);
+        }
+
+        .unit img {
+            width: 100%;
+            height: 100%;
+            border-radius: 0.625rem;
+            object-fit: cover;
+            display: block;
+        }
+
+        .no-price-warning {
+            position: fixed;
+            bottom: 3rem; /* Сдвигаем вверх, чтобы не перекрывать футер */
+            width: 100%;
+            text-align: center;
+            color: red;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-decoration: underline;
+            text-transform: uppercase;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: rgba(51, 51, 51, 0.8);
+            margin-top: auto;
+            position: fixed; /* Фиксируем футер внизу */
+            bottom: 0;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                flex-direction: row;
+                justify-content: space-around;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .value-section {
+                width: 45%;
+            }
+
+            .add-btn {
+                font-size: 2rem;
+                width: 3rem;
+                height: 3rem;
+            }
+
+            .unit-icon, .unit {
+                width: 4rem;
+                height: 4rem;
+            }
+
+            .unit-icon img, .unit img {
+                width: 100%;
+                height: 100%;
+            }
+
+            .unit-quantity {
+                font-size: 0.6rem;
+                padding: 0.15rem 0.3rem;
+            }
+
+            .modal-content {
+                flex-direction: column;
+                width: 90%;
+                padding: 1rem;
+            }
+
+            .unit-categories {
+                flex-direction: row;
+                flex-wrap: wrap;
+                width: 100%;
+            }
+
+            .unit-categories button {
+                flex: 1 1 45%;
+            }
+
+            .quantity-modal .modal-content {
+                width: 90%;
+            }
+
+            .trade-modal .modal-content {
+                width: 90%;
+                max-width: 90%;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .trade-btn {
+                font-size: 0.9rem;
+                padding: 0.3rem 0.6rem;
+            }
+
+            .unit-grid-container {
+                max-height: 50vh;
+            }
+
+            .your-value, .their-value {
+                font-size: 1.2rem;
+            }
+
+            .value-section p {
+                font-size: 0.9rem;
+            }
+
+            .no-price-warning {
+                font-size: 1rem;
+                bottom: 2.5rem; /* Уменьшаем расстояние на мобильных устройствах */
+            }
+
+            footer {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Добавление юнитов</h1>
-    <button onclick="document.getElementById('popup').style.display='block'">+</button>
-    
-    <div id="popup" class="popup">
-        <h2>Окно для юнитов</h2>
-        <p>Здесь будут появляться юниты</p>
-        <button onclick="document.getElementById('popup').style.display='none'">Закрыть</button>
+    <header>
+        <div class="logo">GROW A GARDEN</div>
+        <button class="trade-btn" onclick="openTradeModal()">Trades</button>
+    </header>
+
+    <main>
+        <div class="value-section">
+            <h2 class="your-value">Your Value</h2>
+            <button class="add-btn" onclick="openModal('left')">+</button>
+            <div class="selected-units" id="leftUnitList"></div>
+            <p>TOTAL VALUE: <span id="left-total">0</span></p>
+        </div>
+        <div class="value-section">
+            <h2 class="their-value">Their Value</h2>
+            <button class="add-btn" onclick="openModal('right')">+</button>
+            <div class="selected-units" id="rightUnitList"></div>
+            <p>TOTAL VALUE: <span id="right-total">0</span></p>
+        </div>
+    </main>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">×</span>
+            <div class="unit-categories">
+                <button onclick="showUnits('PETS')">PETS</button>
+                <button onclick="showUnits('SHEKELS')">SHEKELS</button>
+            </div>
+            <div class="unit-grid-container">
+                <div class="unit-grid" id="unit-grid"></div>
+            </div>
+        </div>
     </div>
+
+    <div id="quantity-modal" class="quantity-modal">
+        <div class="modal-content">
+            <h2 id="quantity-title">Enter Value <span class="close" onclick="closeQuantityModal()">×</span></h2>
+            <input type="number" id="valueInput" placeholder="Enter value" min="0">
+            <button id="add" onclick="confirmValue()">Add</button>
+        </div>
+    </div>
+
+    <div id="trade-modal" class="trade-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeTradeModal()">×</span>
+            <h2>Trades</h2>
+            <div class="trade-form">
+                <select id="offer-item">
+                    <option value="">Select Offering Item</option>
+                </select>
+                <input type="number" id="offer-quantity" placeholder="Quantity" min="1">
+                <input type="text" id="offer-value" placeholder="Value (e.g., 6.57 kg or $1,000,000,000)">
+                <input type="text" id="offer-age" placeholder="Age (e.g., 28)">
+                <select id="want-item">
+                    <option value="">Select Wanted Item</option>
+                </select>
+                <button onclick="submitTrade()">Submit Trade</button>
+            </div>
+            <div class="trade-list" id="trade-list"></div>
+        </div>
+    </div>
+
+    <div class="no-price-warning">У питомцев пока что нет стоимости!</div>
+
+    <footer>
+        <p>Created by @NAVARRLO</p>
+    </footer>
+
+    <script>
+        let totalValueLeft = 0;
+        let totalValueRight = 0;
+        let currentContainer = '';
+        let currentUnit = null;
+        let trades = [];
+
+        const units = {
+            "Turtle": { "img": "https://static.wikia.nocookie.net/growagarden/images/b/b1/Turtle_icon.png/revision/latest/scale-to-width-down/80?cb=20250515234534" },
+            "Raccoon": { "img": "https://files.catbox.moe/3p0fq9.webp" },
+            "Night Owl": { "img": "https://files.catbox.moe/qjm5lf.webp" },
+            "Dragonfly": { "img": "https://files.catbox.moe/6t9f3n.webp" },
+            "Blood Owl": { "img": "https://files.catbox.moe/2ko7zm.webp" },
+            "Squirrel": { "img": "https://files.catbox.moe/vdt7y5.webp" },
+            "Snail": { "img": "https://files.catbox.moe/w22ia8.webp" },
+            "Red Giant Ant": { "img": "https://files.catbox.moe/5lhl8u.webp" },
+            "Red Fox": { "img": "https://files.catbox.moe/u6cscg.webp" },
+            "Praying Mantis": { "img": "https://files.catbox.moe/5gu4my.webp" },
+            "Owl": { "img": "https://files.catbox.moe/arsv0g.webp" },
+            "Grey Mouse": { "img": "https://files.catbox.moe/yryr5s.webp" },
+            "Giant Ant": { "img": "https://files.catbox.moe/90li29.webp" },
+            "Echo Frog": { "img": "https://files.catbox.moe/sa86gx.webp" },
+            "Caterpillar": { "img": "https://files.catbox.moe/dlav8m.webp" },
+            "Brown Mouse": { "img": "https://files.catbox.moe/u663au.webp" },
+            "Blood Kiwi": { "img": "https://files.catbox.moe/hk3ga6.webp" },
+            "Blood Hedgehog": { "img": "https://files.catbox.moe/pggquu.webp" },
+            "Cow": { "img": "https://files.catbox.moe/udlneg.webp" },
+            "Frog": { "img": "https://files.catbox.moe/lul8bk.webp" },
+            "Moon Cat": { "img": "https://files.catbox.moe/hu1o4c.webp" },
+            "Polar Bear": { "img": "https://files.catbox.moe/1kexmm.webp" },
+            "Sea Otter": { "img": "https://files.catbox.moe/472s4c.webp" },
+            "Silver Monkey": { "img": "https://files.catbox.moe/6j3e18.webp" },
+            "SHEKELS": { "img": "https://avatars.mds.yandex.net/i?id=a4590b1be596aaf676830d3c8a7cc25a513b0ffd-5334272-images-thumbs&n=13" }
+        };
+
+        function formatPrice(value) {
+            if (value >= 1000000000000) { // Триллионы
+                return (value / 1000000000000).toFixed(value % 1000000000000 === 0 ? 0 : 1) + 'T';
+            } else if (value >= 1000000000) { // Миллиарды
+                return (value / 1000000000).toFixed(value % 1000000000 === 0 ? 0 : 1) + 'b';
+            } else if (value >= 1000000) { // Миллионы
+                return (value / 1000000).toFixed(value % 1000000 === 0 ? 0 : 1) + 'm';
+            } else if (value >= 1000) { // Тысячи
+                return (value / 1000).toFixed(value % 1000 === 0 ? 0 : 1) + 'k';
+            }
+            return value.toString();
+        }
+
+        function openModal(container) {
+            currentContainer = container;
+            document.getElementById('modal').style.display = 'flex';
+            showUnits('PETS');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function openQuantityModal(unit) {
+            currentUnit = unit;
+            document.getElementById('quantity-modal').style.display = 'flex';
+            document.getElementById('valueInput').value = '';
+        }
+
+        function closeQuantityModal() {
+            document.getElementById('quantity-modal').style.display = 'none';
+        }
+
+        function openTradeModal() {
+            document.getElementById('trade-modal').style.display = 'flex';
+            populateItemDropdowns();
+            displayTrades();
+        }
+
+        function closeTradeModal() {
+            document.getElementById('trade-modal').style.display = 'none';
+        }
+
+        function showUnits(type) {
+            const unitGrid = document.getElementById('unit-grid');
+            unitGrid.innerHTML = '';
+
+            if (type === 'PETS') {
+                Object.keys(units).forEach(unitName => {
+                    if (unitName !== 'SHEKELS') {
+                        const unitDiv = document.createElement('div');
+                        unitDiv.className = 'unit';
+                        unitDiv.innerHTML = `<img src="${units[unitName].img}" alt="${unitName}">`;
+                        unitDiv.setAttribute('data-name', unitName);
+                        unitDiv.addEventListener('click', () => {
+                            addUnit(unitName);
+                            closeModal();
+                        });
+                        unitGrid.appendChild(unitDiv);
+                    }
+                });
+            } else if (type === 'SHEKELS') {
+                const unitDiv = document.createElement('div');
+                unitDiv.className = 'unit';
+                unitDiv.innerHTML = `<img src="${units['SHEKELS'].img}" alt="SHEKELS">`;
+                unitDiv.setAttribute('data-name', 'SHEKELS');
+                unitDiv.addEventListener('click', () => openQuantityModal({ name: 'SHEKELS' }));
+                unitGrid.innerHTML = '';
+                unitGrid.appendChild(unitDiv);
+            }
+        }
+
+        function confirmValue() {
+            const value = parseInt(document.getElementById('valueInput').value) || 0;
+            if (currentUnit) {
+                if (currentUnit.name === 'SHEKELS') {
+                    addShekelsValue(value);
+                }
+            }
+            closeQuantityModal();
+            closeModal();
+        }
+
+        function addUnit(unitName) {
+            let unitList;
+            if (currentContainer === 'left') {
+                unitList = document.getElementById('leftUnitList');
+            } else if (currentContainer === 'right') {
+                unitList = document.getElementById('rightUnitList');
+            }
+
+            const unitIcon = document.createElement('div');
+            unitIcon.className = 'unit-icon';
+            unitIcon.innerHTML = `<img src="${units[unitName].img}" alt="${unitName}">`;
+            unitIcon.setAttribute('data-unit-name', unitName);
+            unitIcon.setAttribute('data-value', 0);
+            unitIcon.addEventListener('click', () => removeUnit(unitName));
+            unitList.appendChild(unitIcon);
+        }
+
+        function addShekelsValue(value) {
+            let unitList;
+            if (currentContainer === 'left') {
+                totalValueLeft += value;
+                unitList = document.getElementById('leftUnitList');
+            } else if (currentContainer === 'right') {
+                totalValueRight += value;
+                unitList = document.getElementById('rightUnitList');
+            }
+
+            const unitIcon = document.createElement('div');
+            unitIcon.className = 'unit-icon';
+            unitIcon.innerHTML = `<img src="${units['SHEKELS'].img}" alt="SHEKELS">`;
+            unitIcon.setAttribute('data-unit-name', 'SHEKELS');
+            unitIcon.setAttribute('data-value', value);
+            unitIcon.addEventListener('click', () => removeUnit('SHEKELS'));
+            unitList.appendChild(unitIcon);
+
+            updateTotals();
+        }
+
+        function removeUnit(unitName) {
+            let unitList;
+            if (currentContainer === 'left') {
+                unitList = document.getElementById('leftUnitList');
+                const unitIcon = unitList.querySelector(`[data-unit-name="${unitName}"]`);
+                if (unitIcon) {
+                    const value = parseInt(unitIcon.getAttribute('data-value'));
+                    totalValueLeft -= value;
+                    unitList.removeChild(unitIcon);
+                }
+            } else if (currentContainer === 'right') {
+                unitList = document.getElementById('rightUnitList');
+                const unitIcon = unitList.querySelector(`[data-unit-name="${unitName}"]`);
+                if (unitIcon) {
+                    const value = parseInt(unitIcon.getAttribute('data-value'));
+                    totalValueRight -= value;
+                    unitList.removeChild(unitIcon);
+                }
+            }
+            updateTotals();
+        }
+
+        function updateTotals() {
+            document.getElementById('left-total').textContent = formatPrice(totalValueLeft);
+            document.getElementById('right-total').textContent = formatPrice(totalValueRight);
+        }
+
+        function populateItemDropdowns() {
+            const offerSelect = document.getElementById('offer-item');
+            const wantSelect = document.getElementById('want-item');
+            offerSelect.innerHTML = '<option value="">Select Offering Item</option>';
+            wantSelect.innerHTML = '<option value="">Select Wanted Item</option>';
+
+            Object.keys(units).forEach(unitName => {
+                const option1 = document.createElement('option');
+                option1.value = unitName;
+                option1.textContent = unitName;
+                offerSelect.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = unitName;
+                option2.textContent = unitName;
+                wantSelect.appendChild(option2);
+            });
+        }
+
+        function submitTrade() {
+            const offerItem = document.getElementById('offer-item').value;
+            const offerQuantity = parseInt(document.getElementById('offer-quantity').value) || 1;
+            const offerValue = document.getElementById('offer-value').value || '';
+            const offerAge = document.getElementById('offer-age').value || '';
+            const wantItem = document.getElementById('want-item').value;
+
+            if (offerItem && wantItem && offerQuantity > 0) {
+                const trade = {
+                    user: "User" + Math.floor(Math.random() * 1000),
+                    offer: { item: offerItem, quantity: offerQuantity, value: offerValue, age: offerAge },
+                    want: { item: wantItem },
+                    time: new Date().toLocaleTimeString()
+                };
+
+                trades.push(trade);
+                displayTrades();
+
+                document.getElementById('offer-item').value = '';
+                document.getElementById('offer-quantity').value = '';
+                document.getElementById('offer-value').value = '';
+                document.getElementById('offer-age').value = '';
+                document.getElementById('want-item').value = '';
+            }
+        }
+
+        function displayTrades() {
+            const tradeList = document.getElementById('trade-list');
+            tradeList.innerHTML = '';
+
+            trades.forEach(trade => {
+                const tradeItem = document.createElement('div');
+                tradeItem.className = 'trade-item';
+                tradeItem.innerHTML = `
+                    <div class="avatar"></div>
+                    <div class="user-info">${trade.user} <span>${trade.time}</span></div>
+                    <div class="offer-wants">
+                        <div>
+                            <img src="${units[trade.offer.item].img}" alt="${trade.offer.item}">
+                            <p>x${trade.offer.quantity}</p>
+                            <p>${trade.offer.value}</p>
+                            <p>Age: ${trade.offer.age}</p>
+                        </div>
+                        <div>⇄</div>
+                        <div>
+                            <img src="${units[trade.want.item].img}" alt="${trade.want.item}">
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button>Chat</button>
+                        <button>Trade</button>
+                    </div>
+                `;
+                tradeList.appendChild(tradeItem);
+            });
+        }
+    </script>
 </body>
 </html>
